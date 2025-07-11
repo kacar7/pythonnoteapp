@@ -16,7 +16,10 @@ app.secret_key = os.urandom(24) # Secret key for session management
 try:
     # Check if Firebase app is already initialized to prevent re-initialization errors
     if not firebase_admin._apps:
-        cred = credentials.Certificate('GOOGLE_APPLICATION_CREDENTIALS')
+        cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+        if not cred_path:
+            raise ValueError("Environment variable GOOGLE_APPLICATION_CREDENTIALS not set")
+        cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
     db = firestore.client()
     print("Firebase Admin SDK initialized successfully.")
