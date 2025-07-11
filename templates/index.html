@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Topic Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for drag and drop feedback */
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #6366F1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 p-4 font-sans text-gray-800">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-8">
+        <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8 tracking-tight">
+            My Topic Tracker
+        </h1>
+
+        <!-- User ID Display and Sign Out -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-sm text-gray-600">
+                User ID: <span id="userIdDisplay" class="font-mono bg-gray-100 px-2 py-1 rounded-md text-xs">{{ user_id }}</span>
+            </div>
+            <button
+                id="signOutButton"
+                class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300"
+            >
+                Sign Out
+            </button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-center space-x-4 mb-8">
+            <button
+                id="topicsNavButton"
+                class="font-bold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 bg-indigo-700 text-white"
+            >
+                Topics
+            </button>
+            <button
+                id="notesNavButton"
+                class="font-bold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 bg-purple-600 hover:bg-purple-700 text-white focus:ring-purple-300"
+            >
+                Notes
+            </button>
+            <button
+                id="todosNavButton"
+                class="font-bold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-300"
+            >
+                Todo List
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div id="contentArea">
+            <!-- Topics Section (Default View) -->
+            <div id="topicsSection" class="page-section">
+                <div class="flex justify-center mb-8">
+                    <button
+                        id="addTopicButton"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+                    >
+                        Add New Topic
+                    </button>
+                </div>
+                <div id="topicsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Topics will be rendered here by JavaScript -->
+                    <div id="beginnerColumn" class="bg-white rounded-xl shadow-lg p-5 border-t-8 border-indigo-600" data-category="beginner">
+                        <h2 class="text-2xl font-bold mb-5 text-center capitalize text-indigo-600">Beginner</h2>
+                        <div class="space-y-4 min-h-[100px] topic-list"></div>
+                    </div>
+                    <div id="intermediateColumn" class="bg-white rounded-xl shadow-lg p-5 border-t-8 border-amber-500" data-category="intermediate">
+                        <h2 class="text-2xl font-bold mb-5 text-center capitalize text-amber-500">Intermediate</h2>
+                        <div class="space-y-4 min-h-[100px] topic-list"></div>
+                    </div>
+                    <div id="expertColumn" class="bg-white rounded-xl shadow-lg p-5 border-t-8 border-red-500" data-category="expert">
+                        <h2 class="text-2xl font-bold mb-5 text-center capitalize text-red-500">Expert</h2>
+                        <div class="space-y-4 min-h-[100px] topic-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div id="notesSection" class="page-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <button
+                        id="backToTopicsFromNotes"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg shadow transition duration-300"
+                    >
+                        &larr; Back to Topics
+                    </button>
+                    <h2 class="text-3xl font-bold text-gray-900">My Notes</h2>
+                    <button
+                        id="addNoteButton"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
+                    >
+                        Add New Note
+                    </button>
+                </div>
+                <div id="notesList" class="space-y-4">
+                    <!-- Notes will be rendered here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Todo List Section -->
+            <div id="todosSection" class="page-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <button
+                        id="backToTopicsFromTodos"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg shadow transition duration-300"
+                    >
+                        &larr; Back to Topics
+                    </button>
+                    <h2 class="text-3xl font-bold text-gray-900">My Todo List</h2>
+                    <button
+                        id="addTodoButton"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                    >
+                        Add New Todo
+                    </button>
+                </div>
+                <div id="todosList" class="space-y-4">
+                    <!-- Todos will be rendered here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Topic Modal -->
+    <div id="topicModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 id="topicModalTitle" class="text-2xl font-bold text-gray-900 mb-4">Add New Topic</h2>
+            <input
+                type="text"
+                id="topicNameInput"
+                placeholder="Enter topic name"
+                class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            <div class="flex justify-end space-x-3">
+                <button
+                    id="cancelTopicButton"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    id="saveTopicButton"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
+                >
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 id="noteModalTitle" class="text-2xl font-bold text-gray-900 mb-4">Add New Note</h2>
+            <textarea
+                id="noteContentInput"
+                placeholder="Write your note here..."
+                rows="5"
+                class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-green-500 focus:border-green-500 resize-y"
+            ></textarea>
+            <div class="flex justify-end space-x-3">
+                <button
+                    id="cancelNoteButton"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    id="saveNoteButton"
+                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200"
+                >
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Todo Modal -->
+    <div id="todoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 id="todoModalTitle" class="text-2xl font-bold text-gray-900 mb-4">Add New Todo</h2>
+            <input
+                type="text"
+                id="todoTextInput"
+                placeholder="Enter todo item"
+                class="w-full p-3 border border-gray-300 rounded-md mb-4 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div class="flex justify-end space-x-3">
+                <button
+                    id="cancelTodoButton"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-200"
+                >
+                    Cancel
+                </button>
+                <button
+                    id="saveTodoButton"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
+                >
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
