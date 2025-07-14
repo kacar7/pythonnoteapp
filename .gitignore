@@ -1,0 +1,13 @@
+# Firebase anahtarı
+serviceAccountKey.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Ortam dosyaları
+.env
+
+# IDE ayarları (opsiyonel)
+.vscode/
+.idea/

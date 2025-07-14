@@ -4,9 +4,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 import uuid # For generating user IDs for the hardcoded login
+from flask_cors import CORS
+import json
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # Secret key for session management
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5000"])
+
 
 # --- Firebase Admin SDK Initialization ---
 # IMPORTANT: Replace 'path/to/your/serviceAccountKey.json' with the actual path
@@ -16,7 +21,9 @@ app.secret_key = os.urandom(24) # Secret key for session management
 try:
     # Check if Firebase app is already initialized to prevent re-initialization errors
     if not firebase_admin._apps:
-        cred = credentials.Certificate('GOOGLE_APPLICATION_CREDENTIALS')
+        firebase_key_str = os.environ.get("FIREBASE_KEY_JSON")
+        firebase_key = json.loads(firebase_key_str)
+        cred = credentials.Certificate(firebase_key)
         firebase_admin.initialize_app(cred)
     db = firestore.client()
     print("Firebase Admin SDK initialized successfully.")
@@ -55,6 +62,7 @@ def main_app():
     """Serves the main application page after successful login."""
     if not session.get('logged_in'):
         return redirect(url_for('login_page'))
+    print (session['user_id'])  #hardcoded user id
     return render_template('index.html', user_id=session['user_id'])
 
 @app.route('/logout')

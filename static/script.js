@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeTopicModal();
             fetchTopics(); // Re-fetch all topics to update the UI
         } catch (error) {
+            
             console.error("Error saving topic:", error);
             alert("Failed to save topic. Please try again.");
         }
