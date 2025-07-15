@@ -125,20 +125,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         topics.forEach(topic => {
-            const topicElement = document.createElement('div');
-            topicElement.id = `topic-${topic.id}`;
-            topicElement.draggable = true;
-            topicElement.dataset.topicId = topic.id;
-            topicElement.classList.add(
-                'bg-gray-50', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'items-center',
-                'justify-between', 'cursor-grab', 'hover:shadow-lg', 'transition',
-                'duration-200', 'ease-in-out', 'transform', 'hover:-translate-y-1'
-            );
-            topicElement.innerHTML = `
-                <span class="text-lg font-medium text-gray-800 break-words flex-grow">
-                    ${topic.name}
-                </span>
-                <div class="flex space-x-2 ml-4">
+        const topicElement = document.createElement('div');
+        topicElement.id = `topic-${topic.id}`;
+        topicElement.dataset.topicId = topic.id;
+        topicElement.classList.add(
+            'bg-gray-50', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'items-center',
+            'justify-between', 'hover:shadow-lg', 'transition',
+            'duration-200', 'ease-in-out', 'transform', 'hover:-translate-y-1'
+        );
+
+        const categoryButtons = `
+            <button class="text-sm px-2 py-1 rounded bg-green-200 text-green-800 promote-btn" data-id="${topic.id}" data-category="${topic.category}">
+                ↑ Promote
+            </button>
+            <button class="text-sm px-2 py-1 rounded bg-yellow-200 text-yellow-800 demote-btn" data-id="${topic.id}" data-category="${topic.category}">
+                ↓ Demote
+            </button>
+        `;
+
+        topicElement.innerHTML = `
+            <span class="text-lg font-medium text-gray-800 break-words flex-grow">
+                ${topic.name}
+            </span>
+            <div class="flex flex-col items-end space-y-1 ml-4">
+                ${categoryButtons}
+                <div class="flex space-x-2">
                     <button class="text-blue-600 hover:text-blue-800 transition duration-200 edit-topic-btn" title="Edit Topic" data-id="${topic.id}" data-name="${topic.name}">
                         ${getEditIcon()}
                     </button>
@@ -146,26 +157,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${getDeleteIcon()}
                     </button>
                 </div>
-            `;
+            </div>
+        `;
 
-            topicElement.addEventListener('dragstart', (e) => {
-                draggedTopicId = topic.id;
-                e.currentTarget.classList.add('dragging');
-            });
+        // Append to correct column
+        if (topic.category === 'beginner') {
+            beginnerList.appendChild(topicElement);
+        } else if (topic.category === 'intermediate') {
+            intermediateList.appendChild(topicElement);
+        } else if (topic.category === 'expert') {
+            expertList.appendChild(topicElement);
+        }
+    });
 
-            topicElement.addEventListener('dragend', (e) => {
-                e.currentTarget.classList.remove('dragging');
-                draggedTopicId = null;
-            });
-
-            if (topic.category === 'beginner') {
-                beginnerList.appendChild(topicElement);
-            } else if (topic.category === 'intermediate') {
-                intermediateList.appendChild(topicElement);
-            } else if (topic.category === 'expert') {
-                expertList.appendChild(topicElement);
-            }
-        });
 
         // Add event listeners for edit and delete buttons after rendering
         document.querySelectorAll('.edit-topic-btn').forEach(button => {
@@ -180,6 +184,26 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 const id = e.currentTarget.dataset.id;
                 deleteTopic(id);
+            });
+        });
+
+        // Promote Topic
+        document.querySelectorAll('.promote-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.dataset.id;
+                const category = button.dataset.category;
+                const nextCategory = getNextCategory(category);
+                if (nextCategory) updateTopicCategory(id, nextCategory);
+            });
+        });
+
+        // Demote Topic
+        document.querySelectorAll('.demote-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.dataset.id;
+                const category = button.dataset.category;
+                const previousCategory = getPreviousCategory(category);
+                if (previousCategory) updateTopicCategory(id, previousCategory);
             });
         });
     };
@@ -622,6 +646,33 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error signing out.');
         }
     });
+    const getNextCategory = (current) => {
+    if (current === 'beginner') return 'intermediate';
+    if (current === 'intermediate') return 'expert';
+    return null;
+};
+
+    const getPreviousCategory = (current) => {
+        if (current === 'expert') return 'intermediate';
+        if (current === 'intermediate') return 'beginner';
+        return null;
+    };
+
+    const updateTopicCategory = async (id, newCategory) => {
+        try {
+            const response = await fetch(`/api/topics/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category: newCategory })
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            fetchTopics();
+        } catch (error) {
+            console.error("Error updating topic category:", error);
+            alert("Failed to update topic category.");
+        }
+    };
+
 
     // Initial load
     showPage('topicsSection'); // Show topics by default
