@@ -413,9 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
    todos.forEach(todo => {
     const todoElement = document.createElement('div');
     todoElement.classList.add(
-        'bg-white', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'items-center', 'justify-between',
-        todo.completed ? 'opacity-60 line-through' : '' // Add classes correctly here
-    );
+    'bg-white', 'p-4', 'rounded-lg', 'shadow-md', 'flex', 'items-center', 'justify-between',
+    ...(todo.completed ? ['opacity-60', 'line-through'] : []));
     todoElement.innerHTML = `
         <span class="text-lg font-medium text-gray-800 break-words flex-grow mr-4">
             ${todo.text}

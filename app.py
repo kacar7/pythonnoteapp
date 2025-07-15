@@ -10,7 +10,10 @@ import json
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # Secret key for session management
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5000"])
+CORS(app, supports_credentials=True, origins=["https://kacarnotlication.onrender.com/"])
+
+TEST_EMAIL = os.environ.get("TEST_EMAIL")
+TEST_PASSWORD = os.environ.get("TEST_PASSWORD")
 
 
 # --- Firebase Admin SDK Initialization ---
@@ -50,12 +53,13 @@ def login():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    if email == 'test@test.com' and password == '123321':
+    if email == TEST_EMAIL and password == TEST_PASSWORD:
         session['logged_in'] = True
         session['user_id'] = HARDCODED_USER_ID
         return redirect(url_for('main_app'))
     else:
-        return render_template('login.html', error='Invalid email or password. Please use test/123321.')
+        return render_template('login.html', error='Invalid email or password.')
+
 
 @app.route('/app')
 def main_app():
@@ -288,4 +292,4 @@ if __name__ == '__main__':
     # Ensure 'templates' and 'static' directories exist
     os.makedirs('templates', exist_ok=True)
     os.makedirs('static', exist_ok=True)
-    app.run(debug=True) # Set debug=False in production
+    app.run(debug=False) # Set debug=False in production
